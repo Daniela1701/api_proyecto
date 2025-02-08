@@ -12,21 +12,19 @@ export const getClientes = async (req, res) => {
   }
 };
 
-export const getCliente = async (req, res) => {
+export const getClienteById = async (req, res) => {
+  const { id } = req.params;
+
   try {
-      const [rows] = await pool.query('SELECT * FROM clientes WHERE id = ?', [
-          req.params.id
-      ]);
+    const [cliente] = await pool.query("SELECT * FROM clientes WHERE id = ?", [id]);
 
-      if (rows.length <= 0) return res.status(404).json({
-          message: 'Cliente no encontrado'
-      });
+    if (cliente.length === 0) {
+      return res.status(404).json({ message: "Cliente no encontrado" });
+    }
 
-      res.json(rows[0]);
+    res.status(200).json(cliente[0]); 
   } catch (error) {
-      return res.status(500).json({
-          message: 'Something goes wrong'
-      });
+    res.status(500).json({ message: "Error al obtener el cliente" });
   }
 };
 
