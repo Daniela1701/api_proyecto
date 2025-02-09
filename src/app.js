@@ -2,7 +2,7 @@ import express from "express";
 import clientesRoutes from "./routes/clientes.routes.js";
 import ventasRoutes from "./routes/ventas.routes.js";
 import reporteRoutes from "./routes/reporte.routes.js"
-import bcrypt from "bcryptjs";
+import bcrypt from "bcrypt";
 import { pool } from "./db.js"; 
 import dotenv from "dotenv";
 
