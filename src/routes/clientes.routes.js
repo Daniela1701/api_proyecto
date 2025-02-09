@@ -17,6 +17,6 @@ router.post("/", createCliente);
 
 router.delete("/:id", deleteCliente);
 
-router.put( "/:numero_doc", updateCliente);
+router.put( "/:id", updateCliente);
 
 export default router;
