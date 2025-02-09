@@ -20,16 +20,15 @@ export const pool = new Pool({
     }
 });
 
-async function testDBConnection() {
+export async function testDBConnection() {
     try {
         const client = await pool.connect();
-        const [rows] = await client.query("SELECT * FROM clientes");
-        console.log("Conexión exitosa a la base de datos.",rows);
+        const result = await client.query("SELECT * FROM clientes");
+        console.log("Conexión exitosa a la base de datos.", result.rows);
         client.release();
     } catch (error) {
         console.error("Error al conectar a la base de datos:", error);
     }
 }
-
 // Llamamos a la función de prueba
 testDBConnection();
