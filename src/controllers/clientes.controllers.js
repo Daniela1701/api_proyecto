@@ -18,7 +18,7 @@ export const getClienteById = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const result = await pool.query("SELECT * FROM clientes WHERE id = ?", [id]);
+    const result = await pool.query("SELECT * FROM clientes WHERE id = $1", [id]);
     const rows = result.rows;
 
     if (rows.length <= 0) {
@@ -37,22 +37,12 @@ export const createCliente = async (req, res) => {
 
   try {
       const result = await pool.query(
-        'INSERT INTO clientes (id, nombre, apellido, correo, celular, direccion, ciudad, pais, distrito, provincia) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', 
+        'INSERT INTO clientes (id, nombre, apellido, correo, celular, direccion, ciudad, pais, distrito, provincia) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *', 
         [id, nombre, apellido, correo, celular, direccion, ciudad, pais, distrito, provincia]
       );
 
-      res.status(201).json({
-          id,
-          nombre,
-          apellido,
-          correo,
-          celular,
-          direccion,
-          ciudad,
-          pais,
-          distrito,
-          provincia
-      });
+      const newCliente = result.rows[0];
+      res.status(201).json(newCliente);
   } catch (error) {
       console.error("Error al crear cliente:", error);
       return res.status(500).json({ message: 'Something goes wrong', error: error.message });
@@ -62,7 +52,7 @@ export const createCliente = async (req, res) => {
 export const deleteCliente = async (req, res) => {
   const { id } = req.params;
   try {
-    const result = await pool.query('DELETE FROM clientes WHERE id = ?', [id]);
+    const result = await pool.query('DELETE FROM clientes WHERE id = $1 RETURNING *', [id]);
 
     if (result.rowCount === 0)
       return res.status(404).json({
@@ -85,7 +75,7 @@ export const updateCliente = async (req, res) => {
 
   try {
       const result = await pool.query(
-          "UPDATE clientes SET nombre = IFNULL(?, nombre), apellido = IFNULL(?, apellido), correo = IFNULL(?, correo), celular = IFNULL(?, celular), direccion = IFNULL(?, direccion), ciudad = IFNULL(?, ciudad), pais = IFNULL(?, pais), distrito = IFNULL(?, distrito), provincia = IFNULL(?, provincia) WHERE id = ?",
+          "UPDATE clientes SET nombre = COALESCE($1, nombre), apellido = COALESCE($2, apellido), correo = COALESCE($3, correo), celular = COALESCE($4, celular), direccion = COALESCE($5, direccion), ciudad = COALESCE($6, ciudad), pais = COALESCE($7, pais), distrito = COALESCE($8, distrito), provincia = COALESCE($9, provincia) WHERE id = $10 RETURNING *",
           [nombre, apellido, correo, celular, direccion, ciudad, pais, distrito, provincia, id]
       );
 
@@ -93,8 +83,7 @@ export const updateCliente = async (req, res) => {
           return res.status(404).json({ message: "Cliente no encontrado" });
       }
 
-      const updatedResult = await pool.query("SELECT * FROM clientes WHERE id = ?", [id]);
-      const updatedCliente = updatedResult.rows[0];
+      const updatedCliente = result.rows[0];
       res.json(updatedCliente);
 
   } catch (error) {

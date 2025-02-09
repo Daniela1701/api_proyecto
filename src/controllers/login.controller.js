@@ -4,18 +4,17 @@ import { pool } from '../db.js';
 import { SECRET_KEY } from '../config.js'; 
 
 const login = async (req, res) => {
-  const { username, passwword } = req.body;
+  const { username, password } = req.body;
 
   try {
- 
-    const [rows] = await pool.execute('SELECT * FROM usuarios WHERE username = ?', [username]);
+    const result = await pool.query('SELECT * FROM usuarios WHERE username = $1', [username]);
 
-    if (rows.length === 0) {
+    if (result.rows.length === 0) {
       return res.status(401).json({ message: 'Usuario no encontrado' });
     }
 
-    const usuarioEncontrado = rows[0];
-    const esValida = await bcrypt.compare(passwword, usuarioEncontrado.passwword);
+    const usuarioEncontrado = result.rows[0];
+    const esValida = await bcrypt.compare(password, usuarioEncontrado.password);
 
     if (!esValida) {
       return res.status(401).json({ message: 'Contraseña incorrecta' });

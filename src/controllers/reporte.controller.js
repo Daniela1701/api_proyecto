@@ -11,7 +11,7 @@ export const obtenerReporteCliente = async (req, res) => {
 
   try {
     // Realizamos la consulta a la base de datos para obtener los detalles del cliente y la venta
-    const [rows, fields] = await pool.execute(`
+    const result = await pool.query(`
       SELECT 
         c.numero_documento, 
         CONCAT(c.nombre, ' ', c.apellido) AS cliente,
@@ -27,8 +27,10 @@ export const obtenerReporteCliente = async (req, res) => {
         v.medio_pago
       FROM clientes c
       JOIN ventas v ON c.numero_documento = v.numero_documento
-      WHERE c.numero_documento = ? AND v.fecha_venta = ?
+      WHERE c.numero_documento = $1 AND v.fecha_venta = $2
     `, [clienteId, fechaVenta]);
+
+    const rows = result.rows;
 
     if (rows.length === 0) {
       return res.status(404).json({ message: "No se encontraron datos para el cliente y la fecha proporcionados." });
