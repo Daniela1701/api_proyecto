@@ -1,37 +1,30 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const db = require('../db');
+const config = require('../config');
 
 const login = async (req, res) => {
-  const { user, password } = req.body;
+    const { usuario, contraseña } = req.body;
 
-  if (!user || !password) {
-    return res.status(400).json({ message: 'Usuario y contraseña son requeridos' });
-  }
-
-  try {
-    // Verificar si el usuario existe
-    const query = 'SELECT * FROM administradores WHERE user = ?';
-    const [rows] = await db.execute(query, [user]);
+    // Buscar el usuario en la base de datos
+    const [rows] = await db.execute('SELECT * FROM administradores WHERE usuario = ?', [usuario]);
 
     if (rows.length === 0) {
-      return res.status(401).json({ message: 'Usuario no encontrado' });
+        return res.status(401).json({ message: 'Usuario no encontrado' });
     }
 
-    const admin = rows[0];
+    // Verificar la contraseña
+    const usuarioEncontrado = rows[0];
+    const esValida = await bcrypt.compare(contraseña, usuarioEncontrado.contraseña);
 
-    // Comparar la contraseña con bcrypt
-    const isMatch = await bcrypt.compare(password, admin.password);
-
-    if (!isMatch) {
-      return res.status(401).json({ message: 'Contraseña incorrecta' });
+    if (!esValida) {
+        return res.status(401).json({ message: 'Contraseña incorrecta' });
     }
 
-    // Si la autenticación es exitosa
-    res.status(200).json({ message: 'Autenticación exitosa' });
+    // Generar un token JWT
+    const token = jwt.sign({ id: usuarioEncontrado.id }, config.secretKey, { expiresIn: '1h' });
 
-  } catch (error) {
-    res.status(500).json({ message: 'Error del servidor', error });
-  }
+    return res.status(200).json({ message: 'Inicio de sesión exitoso', token });
 };
 
 module.exports = { login };
