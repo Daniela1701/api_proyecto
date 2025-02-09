@@ -1,13 +1,16 @@
 import { pool } from "../db.js";  
 
 
+
 export const getClientes = async (req, res) => {
   try {
       const [rows] = await pool.query('SELECT * FROM clientes');
       res.json(rows);
   } catch (error) {
+      console.error("Error al obtener clientes:", error);
       return res.status(500).json({
-          message: 'Something goes wrong'
+          message: 'Something goes wrong',
+          error: error.message
       });
   }
 };
