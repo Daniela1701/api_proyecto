@@ -9,7 +9,7 @@ import {
 
 const router = Router();
 
-router.get("/:id", getClientes);
+router.get("/", getClientes);
 
 router.get("/:id", getClienteById );
 
@@ -17,6 +17,6 @@ router.post("/", createCliente);
 
 router.delete("/:id", deleteCliente);
 
-router.put( "/:id", updateCliente);
+router.put( "/:numero_doc", updateCliente);
 
 export default router;
