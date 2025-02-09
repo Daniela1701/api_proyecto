@@ -5,7 +5,7 @@ import {
     DB_DATABASE,
     DB_USER,
     DB_PASSWORD,
-    PORT
+    DB_PORT
 } from './config.js';
 
 export const pool = new Pool({
@@ -13,7 +13,7 @@ export const pool = new Pool({
     user: DB_USER,
     password: DB_PASSWORD,
     database: DB_DATABASE,
-    port: PORT, // Puerto predeterminado para PostgreSQL
+    port: DB_PORT, // Puerto predeterminado para PostgreSQL
     connectionTimeoutMillis: 10000 ,
     ssl: {
         rejectUnauthorized: false
