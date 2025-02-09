@@ -9,6 +9,6 @@ import {
 export const pool = createPool({
     host: DB_HOST,
     user: DB_USER,
-    password: '', 
+    password: DB_PASSWORD, 
     database: DB_DATABASE
 });
