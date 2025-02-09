@@ -1,46 +1,46 @@
 import { pool } from "../db.js";  // Importamos la conexión a la base de datos
 
-// Función que maneja la solicitud GET para obtener el reporte del cliente
-export const obtenerReporteCliente = async (req, res) => {
-  const { clienteId, fechaVenta } = req.query;  // Obtenemos los parámetros de la consulta (ID del cliente y fecha de la venta)
+export const getReporteByDocumento = async (req, res) => {
+    try {
+        const { documento, anio } = req.params;  // Obtenemos los parámetros de la URL
 
-  // Verificamos que se hayan recibido ambos parámetros
-  if (!clienteId || !fechaVenta) {
-    return res.status(400).json({ message: "Faltan parámetros: clienteId y fechaVenta" });
-  }
+        // Consulta directa en PostgreSQL sin procedimientos almacenados
+        const result = await pool.query(`
+            SELECT 
+                c.id,
+                c.nombre,
+                c.apellido,
+                c.correo,
+                c.celular AS telefono,
+                c.direccion,
+                c.ciudad,
+                c.pais,
+                c.distrito,
+                c.provincia,
+                v.id AS numero_registro,
+                v.tipo_servicio,
+                v.turno,
+                v.tipo_sesion,
+                v.horario,
+                v.estado,
+                v.fecha_registro,
+                v.monto_pago AS costo, 
+                v.medio_pago,
+                v.fecha_pago
+            FROM clientes c
+            JOIN ventas v ON c.id = v.cliente_id 
+            WHERE c.id = $1 AND EXTRACT(YEAR FROM v.fecha_registro) = $2
+        `, [documento, anio]);
 
-  try {
-    // Realizamos la consulta a la base de datos para obtener los detalles del cliente y la venta
-    const result = await pool.query(`
-      SELECT 
-        c.numero_documento, 
-        CONCAT(c.nombre, ' ', c.apellido) AS cliente,
-        c.email,
-        c.telefono,
-        v.servicio, 
-        v.turno, 
-        v.tipo_sesion AS tipo,
-        v.horario,
-        v.estado,
-        v.monto,
-        v.fecha_pago,
-        v.medio_pago
-      FROM clientes c
-      JOIN ventas v ON c.numero_documento = v.numero_documento
-      WHERE c.numero_documento = $1 AND v.fecha_venta = $2
-    `, [clienteId, fechaVenta]);
+        // Verificar si hay resultados
+        if (result.rows.length === 0) {
+            return res.status(404).json({ message: 'No se encontraron ventas para este cliente en el año indicado' });
+        }
 
-    const rows = result.rows;
+        res.json({ cliente: result.rows[0], ventas: result.rows });
 
-    if (rows.length === 0) {
-      return res.status(404).json({ message: "No se encontraron datos para el cliente y la fecha proporcionados." });
+    } catch (error) {
+        console.error('Error en la consulta:', error);
+        return res.status(500).json({ message: 'Ocurrió un error en el servidor' });
     }
-
-    // Respondemos con los datos obtenidos
-    res.json(rows); 
-  } catch (error) {
-    // Si hay un error en la consulta, respondemos con un error 500
-    console.error("Error al obtener el reporte del cliente:", error);
-    res.status(500).json({ message: "Error interno del servidor" });
-  }
 };

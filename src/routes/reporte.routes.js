@@ -1,8 +1,8 @@
-import express from 'express';
-const router = express.Router();
+import { Router } from "express";
+import { getReporteByDocumento} from "../controller/reporte.controller.js";
 
-router.get('/', (req, res) => {
-  res.send('Reporte API');
-});
+const router = Router();
 
-export default router
+router.get('/reporte/:documento/:anio',getReporteByDocumento)
+
+export default router;
