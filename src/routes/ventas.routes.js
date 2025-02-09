@@ -1,10 +1,19 @@
 import { Router } from "express";
-import { getVentas, getVentaByDocAndDate, createVenta } from "../controllers/ventas.controllers.js";
+import { 
+  getVentas, 
+  getVentaById, 
+  createVenta, 
+  updateVenta, 
+  deleteVenta 
+} from "../controllers/ventas.controllers.js";
 
 const router = Router();
 
 router.get("/", getVentas);
-router.get("/buscar", getVentaByDocAndDate);
+router.get("/:id", getVentaById);
 router.post("/", createVenta);
+router.put("/:id", updateVenta);
+router.delete("/:id", deleteVenta);
 
 export default router;
+
