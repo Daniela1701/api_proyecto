@@ -18,8 +18,8 @@ export const login = async (req, res) => {
   }
 
   try {
-    const [rows] = await pool.query(
-      "SELECT * FROM usuarios WHERE username = ? AND password = ?",
+    const result = await pool.query(
+      "SELECT * FROM usuarios WHERE username = $1 AND password = $2",
       [username, password]
     );
 
