@@ -33,12 +33,12 @@ export const getClienteById = async (req, res) => {
 };
 
 export const createCliente = async (req, res) => {
-  const { id, nombre, apellido, correo, celular, direccion, ciudad, pais, distrito, provincia } = req.body;
+  const { id, nombre, apellido, correo, celular, direccion, ciudad, pais, distrito, provincia,fecha_registro, tipo_cliente, tipo_documento} = req.body;
 
   try {
       const result = await pool.query(
-        'INSERT INTO clientes (id, nombre, apellido, correo, celular, direccion, ciudad, pais, distrito, provincia) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING *', 
-        [id, nombre, apellido, correo, celular, direccion, ciudad, pais, distrito, provincia]
+        "INSERT INTO clientes (id, nombre, apellido, correo, celular, direccion, ciudad, pais, distrito, provincia, fecha_registro, tipo_cliente, tipo_documento) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13) RETURNING *", 
+        [id, nombre, apellido, correo, celular, direccion, ciudad, pais, distrito, provincia, fecha_registro, tipo_cliente, tipo_documento]
       );
 
       const newCliente = result.rows[0];
@@ -71,12 +71,12 @@ export const deleteCliente = async (req, res) => {
 
 export const updateCliente = async (req, res) => {
   const { id } = req.params;
-  const { nombre, apellido, correo, celular, direccion, ciudad, pais, distrito, provincia } = req.body;
+  const { nombre, apellido, correo, celular, direccion, ciudad, pais, distrito, provincia,fecha_registro, tipo_cliente, tipo_documento } = req.body;
 
   try {
       const result = await pool.query(
-          "UPDATE clientes SET nombre = COALESCE($1, nombre), apellido = COALESCE($2, apellido), correo = COALESCE($3, correo), celular = COALESCE($4, celular), direccion = COALESCE($5, direccion), ciudad = COALESCE($6, ciudad), pais = COALESCE($7, pais), distrito = COALESCE($8, distrito), provincia = COALESCE($9, provincia) WHERE id = $10 RETURNING *",
-          [nombre, apellido, correo, celular, direccion, ciudad, pais, distrito, provincia, id]
+          "UPDATE clientes SET  nombre = COALESCE($1, nombre), apellido = COALESCE($2, apellido), correo = COALESCE($3, correo), celular = COALESCE($4, celular), direccion = COALESCE($5, direccion), ciudad = COALESCE($6, ciudad), pais = COALESCE($7, pais), distrito = COALESCE($8, distrito), provincia = COALESCE($9, provincia),fecha_registro = COALESCE($10, fecha_registro),tipo_cliente = COALESCE($11, tipo_cliente),tipo_documento = COALESCE($12, tipo_documento)WHERE id = $13 RETURNING *",
+          [nombre, apellido, correo, celular, direccion, ciudad, pais, distrito, provincia,fecha_registro, tipo_cliente, tipo_documento, id]
       );
 
       if (result.rowCount === 0) {
