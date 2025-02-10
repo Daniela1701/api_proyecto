@@ -1,11 +1,12 @@
-import { pool } from "../db.js";
+import { pool } from "../db.js"; 
+
 
 export const getUsers = async (req, res) => {
   try {
-    const result = await pool.query("SELECT username, password FROM usuarios");
-    res.json(result.rows); 
+    const result = await pool.query("SELECT * FROM usuarios");
+    res.status(200).json(result.rows);
   } catch (error) {
-    console.error("Error al obtener usuarios:", error);
+    console.error(" Error en el servidor:", error.stack);
     res.status(500).json({ message: "Error en el servidor" });
   }
 };
@@ -24,12 +25,13 @@ export const login = async (req, res) => {
     );
 
     if (result.rows.length > 0) {
-      res.status(200).json({ message: "Inicio de sesión exitoso", redirect: "/index" });
-    } else {
-      res.status(401).json({ message: "Usuario o contraseña incorrectos" });
-    }
+      res.status(200).json({ success: true, redirect: "/inicio" }); 
+  } else {
+      res.status(401).json({ success: false, message: "Usuario o contraseña incorrectos" });
+  }
+  
   } catch (error) {
-    console.error("Error en el servidor:", error);
+    console.error("Error en el servidor:", error.stack);
     res.status(500).json({ message: "Error en el servidor" });
   }
 };
