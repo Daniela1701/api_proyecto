@@ -23,8 +23,8 @@ export const login = async (req, res) => {
       [username, password]
     );
 
-    if (rows.length > 0) {
-      res.status(200).json({ message: "Inicio de sesión exitoso", redirect: "/inicio" });
+    if (result.rows.length > 0) {
+      res.status(200).json({ message: "Inicio de sesión exitoso", redirect: "/index" });
     } else {
       res.status(401).json({ message: "Usuario o contraseña incorrectos" });
     }
